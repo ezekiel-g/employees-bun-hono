@@ -6,9 +6,12 @@ export const validateInput = async (
   context: Context,
   tableName: string,
   queryType: 'INSERT' | 'UPDATE',
-): Promise<[string[] | null, number]> => {
+): Promise<{
+  statusCode: 200 | 201 | 400 | 422
+  messages: string[] | null
+}> => {
   const requestBody = await context.req.json()
-  let statusCode = 200
+  let statusCode: 200 | 201 | 400 | 422 = queryType === 'UPDATE' ? 200 : 201
   let messages: string[] | null = null
 
   const schemaFunction = await getSchemaFunction(tableName, queryType)
@@ -26,5 +29,5 @@ export const validateInput = async (
     messages = [`No schema function found for table '${tableName}'`]
   }
 
-  return [messages, statusCode]
+  return { statusCode, messages }
 }
