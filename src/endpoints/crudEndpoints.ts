@@ -35,16 +35,16 @@ export const crudEndpoints = (tableName: string) => {
   })
 
   router.post('/', async (context) => {
-    const [messages, statusCode] = await validateInput(
+    const validationResult = await validateInput(
       context,
       tableName,
       'INSERT',
     )
 
-    if (statusCode >= 400) {
+    if (validationResult.statusCode >= 400) {
       return context.json(
-        { message: 'Validation error(s)', errors: messages },
-        statusCode as 400 || 422,
+        { message: 'Validation error(s)', errors: validationResult.messages },
+        validationResult.statusCode,
       )
     }
 
@@ -55,7 +55,7 @@ export const crudEndpoints = (tableName: string) => {
         INSERT INTO ${sql(tableName)} ${sql(dataForInsert)} RETURNING *;
       `
 
-      return context.json(row, 201)
+      return context.json(row, validationResult.statusCode)
     }
     catch (error) {
       return handleDbError(context, error, Object.keys(dataForInsert))
@@ -63,16 +63,16 @@ export const crudEndpoints = (tableName: string) => {
   })
 
   router.patch('/:id', async (context) => {
-    const [messages, statusCode] = await validateInput(
+    const validationResult = await validateInput(
       context,
       tableName,
       'UPDATE',
     )
 
-    if (statusCode >= 400) {
+    if (validationResult.statusCode >= 400) {
       return context.json(
-        { message: 'Validation error(s)', errors: messages },
-        statusCode as 400 || 422,
+        { message: 'Validation error(s)', errors: validationResult.messages },
+        validationResult.statusCode,
       )
     }
 
@@ -91,7 +91,7 @@ export const crudEndpoints = (tableName: string) => {
       if (!row)
         return context.json({ message: 'Not found' }, 404)
 
-      return context.json(row, 200)
+      return context.json(row, validationResult.statusCode)
     }
     catch (error) {
       return handleDbError(context, error, Object.keys(dataForUpdate))

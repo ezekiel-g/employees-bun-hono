@@ -22,11 +22,10 @@ describe('validateInput', () => {
     mockContext.req.json.mockReturnValue(requestBody)
     MockGetSchemaFunction.mockReturnValue(mockSchema)
 
-    const [messages, statusCode]
-      = await validateInput(mockContext, 'users', 'INSERT')
+    const result = await validateInput(mockContext, 'users', 'INSERT')
 
-    expect(messages).toBeNull()
-    expect(statusCode).toBe(200)
+    expect(result.messages).toBeNull()
+    expect(result.statusCode).toBe(201)
     expect(mockSchema.safeParse).toHaveBeenCalledWith(requestBody)
   })
 
@@ -41,11 +40,10 @@ describe('validateInput', () => {
     mockContext.req.json.mockReturnValue(requestBody)
     MockGetSchemaFunction.mockReturnValue(mockSchema)
 
-    const [messages, statusCode]
-      = await validateInput(mockContext, 'users', 'INSERT')
+    const result = await validateInput(mockContext, 'users', 'INSERT')
 
-    expect(messages).toContain('required')
-    expect(statusCode).toBe(422)
+    expect(result.messages).toContain('required')
+    expect(result.statusCode).toBe(422)
     expect(mockSchema.safeParse).toHaveBeenCalledWith(requestBody)
   })
 
@@ -53,11 +51,13 @@ describe('validateInput', () => {
     mockContext.req.json.mockReturnValue(requestBody)
     MockGetSchemaFunction.mockReturnValue(null as any)
 
-    const [messages, statusCode]
-      = await validateInput(mockContext, 'nonexistent', 'INSERT')
+    const result = await validateInput(mockContext, 'nonexistent', 'INSERT')
 
-    expect((messages ?? []).join()).toContain('schema function')
-    expect(statusCode).toBe(400)
+    const joinedMessages = (
+      result.messages ?? []
+    ).join()
+    expect(joinedMessages).toContain('schema function')
+    expect(result.statusCode).toBe(400)
   })
 
   it('handles multiple validation errors', async () => {
@@ -76,10 +76,9 @@ describe('validateInput', () => {
     mockContext.req.json.mockReturnValue(requestBody)
     MockGetSchemaFunction.mockReturnValue(mockSchema)
 
-    const [messages, statusCode]
-      = await validateInput(mockContext, 'users', 'UPDATE')
+    const result = await validateInput(mockContext, 'users', 'UPDATE')
 
-    expect((messages ?? []).join()).toContain('required')
-    expect(statusCode).toBe(422)
+    expect((result.messages ?? []).join()).toContain('required')
+    expect(result.statusCode).toBe(422)
   })
 })
