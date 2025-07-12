@@ -68,7 +68,7 @@ describe('department', () => {
     ])
   })
 
-  it('allows create or update without is_active field', () => {
+  it('allows create or update without isActive field', () => {
     delete departmentData.isActive
 
     const result = InsertDepartmentSchema.safeParse(departmentData)

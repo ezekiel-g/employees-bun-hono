@@ -36,15 +36,15 @@ export const InsertDepartmentSchema = z.object({
       },
       'Location not currently valid',
     ),
-  is_active: z.boolean().optional(),
+  isActive: z.boolean().optional(),
 })
 
 export const UpdateDepartmentSchema = InsertDepartmentSchema.partial()
 
 export const DepartmentSchema = InsertDepartmentSchema.extend({
   id: z.number().int(),
-  created_at: z.string(),
-  updated_at: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
 })
 
 export type CreateDepartmentInput = z.infer<typeof InsertDepartmentSchema>
